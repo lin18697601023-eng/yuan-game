@@ -489,28 +489,44 @@
             bgMusicPlaying = !bgMusicPlaying;
         }
 
-        // 朗读词汇 - 使用浏览器原生Speech Synthesis API（手机兼容性更好）
+        // 朗读词汇 - 兼容方案：Speech Synthesis + 降级方案
         function speakWord(text) {
-            // 先停止当前正在播放的语音
-            if (window.speechSynthesis) {
-                window.speechSynthesis.cancel();
-            }
+            console.log('尝试朗读:', text);
             
+            // 方案1: 浏览器原生Speech Synthesis
             if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'zh-CN';
-                utterance.rate = 0.8; // 慢一点，适合小朋友
-                utterance.pitch = 1.1;
+                utterance.rate = 0.7;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
                 
-                // 尝试获取中文语音
-                const voices = window.speechSynthesis.getVoices();
-                const chineseVoice = voices.find(v => v.lang.includes('zh'));
-                if (chineseVoice) {
-                    utterance.voice = chineseVoice;
+                // 语音列表可能还没加载好，等一下
+                const trySpeak = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    console.log('可用语音:', voices.map(v => v.lang));
+                    const chineseVoice = voices.find(v => v.lang.startsWith('zh')) || voices[0];
+                    if (chineseVoice) {
+                        utterance.voice = chineseVoice;
+                    }
+                    window.speechSynthesis.speak(utterance);
+                    console.log('语音播放中...');
+                };
+                
+                if (window.speechSynthesis.getVoices().length > 0) {
+                    trySpeak();
+                } else {
+                    // 等语音加载
+                    window.speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true });
+                    setTimeout(trySpeak, 500);
                 }
-                
-                window.speechSynthesis.speak(utterance);
+                return;
             }
+            
+            // 方案2: 备用 - 简单的提示
+            alert('点击卡片听发音: ' + text);
         }
         
         // 点击卡片朗读
