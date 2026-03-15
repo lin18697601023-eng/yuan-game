@@ -491,17 +491,19 @@
             // 停止之前的朗读
             speechSynthesis.cancel();
             
-            // 延迟一点等待语音列表加载
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'zh-CN';
-                utterance.rate = 0.7;
-                utterance.pitch = 1.1;
-                utterance.volume = 1;
-                
-                // 直接使用默认语音
-                speechSynthesis.speak(utterance);
-            }, 100);
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 0.7;
+            utterance.pitch = 1.1;
+            utterance.volume = 1;
+            
+            speechSynthesis.speak(utterance);
+        }
+        
+        // 点击卡片朗读
+        function speakCurrentWord() {
+            const q = gameQuestions[currentQuestion];
+            if (q) speakWord(q.word);
         }
 
         // 开始背景音乐
@@ -598,11 +600,11 @@
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: ${(currentQuestion / gameQuestions.length) * 100}%"></div>
                 </div>
-                <div class="question-card">
+                <div class="question-card" onclick="speakCurrentWord()">
                     <div class="question-word">${q.word}</div>
                     <div class="question-pinyin">${q.pinyin}</div>
                 </div>
-                <p class="hint">这个是什么意思呀？点击正确的图片！</p>
+                <p class="hint">👆 点击上方卡片可以听发音哦！<br>点击正确的图片！</p>
                 <div class="options">
                     ${options.map((opt, i) => `
                         <div class="option" onclick="selectOption(${i}, event)">
