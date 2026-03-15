@@ -489,13 +489,28 @@
             bgMusicPlaying = !bgMusicPlaying;
         }
 
-        // 朗读词汇 - 使用Google翻译TTS
+        // 朗读词汇 - 使用浏览器原生Speech Synthesis API（手机兼容性更好）
         function speakWord(text) {
-            // 使用Google Translate TTS API
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=zh-CN&client=tw-ob`;
+            // 先停止当前正在播放的语音
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
             
-            const audio = new Audio(url);
-            audio.play().catch(e => console.log('Audio play failed:', e));
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8; // 慢一点，适合小朋友
+                utterance.pitch = 1.1;
+                
+                // 尝试获取中文语音
+                const voices = window.speechSynthesis.getVoices();
+                const chineseVoice = voices.find(v => v.lang.includes('zh'));
+                if (chineseVoice) {
+                    utterance.voice = chineseVoice;
+                }
+                
+                window.speechSynthesis.speak(utterance);
+            }
         }
         
         // 点击卡片朗读
