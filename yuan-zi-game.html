@@ -523,14 +523,6 @@
             const q = gameQuestions[currentQuestion];
             if (q) speakWord(q.word);
         }
-        
-        // 答对后显示发音按钮
-        function showSpeakButton(word) {
-            const hint = document.querySelector('.hint');
-            if (hint) {
-                hint.innerHTML = `<button class="speak-btn" onclick="speakWord('${word}')">🔊 点击听发音</button>`;
-            }
-        }
 
         // 开始背景音乐
         function startBgMusic() {
@@ -664,6 +656,9 @@
             const selectedWord = currentOptions[index].word;
             const isCorrect = selectedWord === correctAnswer;
 
+            // 用户点击时立即朗读！利用点击交互触发语音
+            speakWord(correctAnswer);
+            
             if (isCorrect) {
                 clickedOption.classList.add('correct');
                 score++;
@@ -671,9 +666,6 @@
                 showStarBurst(event);
                 createStarParticles(event);
                 playSound('success');
-                
-                // 显示发音按钮，让用户点击触发
-                showSpeakButton(correctAnswer);
             } else {
                 clickedOption.classList.add('wrong');
                 lives--;
