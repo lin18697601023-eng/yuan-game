@@ -273,6 +273,24 @@
             transition: all 0.3s ease;
         }
 
+        .speak-btn {
+            background: linear-gradient(145deg, #4ECDC4, #44A08D);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         .start-btn:active {
             transform: scale(0.95);
         }
@@ -505,6 +523,14 @@
             const q = gameQuestions[currentQuestion];
             if (q) speakWord(q.word);
         }
+        
+        // 答对后显示发音按钮
+        function showSpeakButton(word) {
+            const hint = document.querySelector('.hint');
+            if (hint) {
+                hint.innerHTML = `<button class="speak-btn" onclick="speakWord('${word}')">🔊 点击听发音</button>`;
+            }
+        }
 
         // 开始背景音乐
         function startBgMusic() {
@@ -646,8 +672,8 @@
                 createStarParticles(event);
                 playSound('success');
                 
-                // 答对了！朗读词汇
-                setTimeout(() => speakWord(correctAnswer), 300);
+                // 显示发音按钮，让用户点击触发
+                showSpeakButton(correctAnswer);
             } else {
                 clickedOption.classList.add('wrong');
                 lives--;
